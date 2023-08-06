@@ -1,63 +1,85 @@
 # Go Traps
 
 Nha Hoang
-28 Jul 2023
+11 Aug 2023
 hdnha11@gmail.com
 @hdnha
 
 ## Go is a wonderful language. But Go has gotchas.
 
-## Slice traversal
+## #1 Slice traversal
 
 Which languages will be printed? Which won't?
 
 .play -edit go-traps/slicetraversal.go /START OMIT/,/STOP OMIT/
 
-: When ranging over a slice with only one variable, it yields the index, not the element.
-: To iterate over just the elements while ignoring the indexes, use the blank identifier _.
-: If iterating over a []int, be careful.
 
-## String traversal
+## Discussion
 
-Can strings also be traversed in Go?
+When ranging over a slice with only one variable, it yields the index, not the element.
+
+To iterate over just the elements while ignoring the indexes, use the blank identifier `_`.
+
+If iterating over a `[]int`, be careful.
+
+## #2 String traversal
+
+Can strings also be traversed in Go? Let's try:
 
 .play -edit go-traps/stringtraversal.go /START OMIT/,/STOP OMIT/
 
-: Strings in Go are slices of bytes (not required to be UTF-8 encoded).
-: String literals, without byte-level escapes, always hold valid UTF-8 sequences.
-: The range loop assumes UTF-8 encoding. 
-: The iteration element is the rune (like a character), and the index is the byte number of the first byte of the rune (not the number of the rune).
-: Runes represent Unicode code points.
+## Next try
+
+.play -edit go-traps/stringtraversal2.go /START OMIT/,/STOP OMIT/
+
+## Discussion
+
+**Strings** in Go are slices of bytes (**not required** to be **UTF-8** encoded).
+
+**String literals**, without byte-level escapes, always hold valid **UTF-8** sequences.
+
+The **range** loop assumes **UTF-8** encoding.
+
+The iteration element is the `rune` (like a character), and the index is the `byte` number of the first `byte` of the `rune` (not the number of the `rune`).
+
+Runes represent Unicode **code points**.
+
 : https://go.dev/blog/strings
+: https://pkg.go.dev/unicode/utf8#RuneCountInString
 
 ## Unicode
 
-Code point
+A letter maps to a **code point**, which is a theoretical concept (e.g. **U+0048**).
 
-Encoding: UTF-8, UTF-16, UTF-32
+Code points need to be **encoded** to be stored in memory.
+
+It does not make sense to have a string without knowing its encoding.
+
+Encoding: **UTF-8**, **UTF-16**, **UTF-32**
 
 .play -edit go-traps/unicode.go /START OMIT/,/STOP OMIT/
 
-: A letter maps to a code point, which is a theoretical concept (e.g. U+0048).
-: To print a code point in Go, use %U or %#U over the rune constant, like '世'.
-: Code points need to be encoded to be stored in memory.
+: A code point, codepoint or code position.
+: Unicode code points, like U+2318 (⌘), are expressed in hexadecimal format.
 : UTF-8 uses 1, 2, 3 or 4 bytes per code point.
-: It does not make sense to have a string without knowing its encoding.
+: To print a code point in Go, use %U or %#U over the rune constant, like '世'.
 : Some helpful formats to examine a string in Go: %x, % x, %q, %+q.
 
-## Loop variable
+## #3 Loop variable
 
 .play -edit go-traps/loopvar.go /START OMIT/,/STOP OMIT/
 
-: Loop variable is per-loop, not per-iteration.
-: Go 1.21 is expected to support GOEXPERIMENT=loopvar, to make loop variables per-iteration instead of per-loop.
+## Discussion
+
+Loop variable is per-loop, not per-iteration.
+
+**Go 1.21** is expected to support `GOEXPERIMENT=loopvar`, to make loop variables per-iteration instead of per-loop.
+
 : https://github.com/golang/go/discussions/56010
 
-## Variable shadowing
+## #4 Variable shadowing
 
 .play -edit go-traps/varshadow.go /START OMIT/,/STOP OMIT/
-
-: Use caution when using := in if statements in Go. Variable shadowing can happen, especially functions returning (result, err) or type assertions like x.(SomeType).
 
 ## Variable shadowing (cont.)
 
@@ -66,29 +88,53 @@ Encoding: UTF-8, UTF-16, UTF-32
 : If the assertion [doesn't hold], the expression returns (Z, false) where Z is the zero value for type T.
 : In this example, x shares the same scope inside the if and else blocks, so reassigning it inside the if block will be visible in the else. However, outside of the if/else, x refers to a separate variable that is still typed as Animal.
 
-## Map fetching/traversal
+## Discussion
+
+Use caution when using `:=` in if statements in Go.
+
+Variable shadowing can happen, especially functions returning `(result, err)` or type assertions like `x.(SomeType)`.
+
+Two different options:
+- uses temporary variables in the inner blocks
+- uses the assignment operator (`=`) in the inner blocks
+
+## #5 Map fetching/traversal
 
 .play -edit go-traps/map.go /START OMIT/,/STOP OMIT/
 
-: Map fetching with non-existent key doesn't panic, it yields the zero value of the element type.
-: Use the two variables assignment v, ok := m["four"] to check if requested key was actually in the map or not. It is called the "comma ok" idiom.
-: There is no guarantee regarding the order of iteration in a hash map.
+## Discussion
 
-## defer what?
+Map fetching with **non-existent** key **doesn't panic**, it yields the **zero value** of the element type.
 
-## Nil error
+Use the two variables assignment `v, ok := m["four"]` to check if requested key was actually in the map or not. It is called the **"comma ok"** idiom.
+
+There is **no guarantee** regarding the order of iteration in a hash map.
+
+## #6 defer what?
+
+## Discussion
+
+## #7 Nil error
+
+## Discussion
 
 : https://go.dev/doc/faq#nil_error
 
-## Append
+## #8 Append
+
+## Discussion
 
 : https://go.dev/blog/slices
 
-## Panic recovery
+## #9 Panic recovery
+
+## Discussion
 
 : https://go.dev/blog/defer-panic-and-recover
 
-## Type embedding
+## #10 Type embedding
+
+## Discussion
 
 ## Links
 
