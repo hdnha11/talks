@@ -128,7 +128,21 @@ The deferred call's **arguments** are **evaluated immediately**.
 
 ## #7 Nil error
 
+Define a custom **DivByZeroError** type to capture division by zero errors.
+
+.play -edit go-traps/error.go /START READ OMIT/,/STOP READ OMIT/
+
+## Usage
+
+.play -edit go-traps/error.go /START EDIT OMIT/,/STOP EDIT OMIT/
+
 ## Discussion
+
+Interfaces are implemented as two elements, a type T and a value V.
+
+An interface value is nil only if the V and T are **both unset**, (T=nil, V is not set).
+
+Functions returning errors should use **error** in signature, not concrete types.
 
 : https://go.dev/doc/faq#nil_error
 
