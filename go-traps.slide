@@ -170,7 +170,21 @@ When appending to a slice, it can **expand up to its capacity** automatically **
 
 ## #9 Panic recovery
 
+.play -edit go-traps/recover.go /START OMIT/,/STOP OMIT/
+
+## Panic protection helper
+
+.code go-traps/recover.go /START HELPER OMIT/,/STOP HELPER OMIT/
+
 ## Discussion
+
+Recover is only useful inside deferred functions.
+
+If the **current goroutine** is panicking, recover captures panic value and resumes normally.
+
+Without recover, panic proceeds up stack, the current goroutine returns, program **crashes**.
+
+Each goroutine must have its own recover, **no global recover**.
 
 : https://go.dev/blog/defer-panic-and-recover
 
