@@ -148,7 +148,17 @@ Functions returning errors should use **error** in signature, not concrete types
 
 ## #8 Append
 
+.play -edit go-traps/append.go /START OMIT/,/STOP OMIT/
+
 ## Discussion
+
+In addition to their **length**, slices in Go have an underlying **capacity**.
+
+The capacity indicates the **maximum size** the slice can grow to **before needing to allocate** new underlying array storage.
+
+When appending to a slice, it can **expand up to its capacity** automatically **without reallocating**. Once capacity is exceeded, a new array is allocated.
+
+👍 Never call **append** without assigning back to the same variable.
 
 : https://go.dev/blog/slices
 
