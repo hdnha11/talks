@@ -120,6 +120,12 @@ There is **no guarantee** regarding the order of iteration in a hash map.
 
 .play -edit go-traps/defer.go /START OMIT/,/STOP OMIT/
 
+## Receivers are arguments
+
+.play -edit go-traps/defer2.go /START OMIT/,/STOP OMIT/
+
+: If the pointer is a receiver, the potential changes to the receiver after the call to defer are visible.
+
 ## Discussion
 
 A **defer** statement defers the **execution** of a function until the surrounding function returns.
