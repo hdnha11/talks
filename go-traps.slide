@@ -69,6 +69,12 @@ Encoding: **UTF-8**, **UTF-16**, **UTF-32**
 
 .play -edit go-traps/loopvar.go /START OMIT/,/STOP OMIT/
 
+## Loop closure
+
+.play -edit go-traps/loopvar2.go /START OMIT/,/STOP OMIT/
+
+: https://pkg.go.dev/golang.org/x/tools/go/analysis/passes/loopclosure
+
 ## Discussion
 
 Loop variable is per-loop, not per-iteration.
@@ -81,7 +87,7 @@ Loop variable is per-loop, not per-iteration.
 
 .play -edit go-traps/varshadow.go /START OMIT/,/STOP OMIT/
 
-## Variable shadowing (cont.)
+## Type assertion
 
 .play -edit go-traps/varshadow2.go /START OMIT/,/STOP OMIT/
 
@@ -112,7 +118,13 @@ There is **no guarantee** regarding the order of iteration in a hash map.
 
 ## #6 defer what?
 
+.play -edit go-traps/defer.go /START OMIT/,/STOP OMIT/
+
 ## Discussion
+
+A **defer** statement defers the **execution** of a function until the surrounding function returns.
+
+The deferred call's **arguments** are **evaluated immediately**.
 
 ## #7 Nil error
 
