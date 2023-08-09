@@ -13,7 +13,6 @@ Which languages will be printed? Which won't?
 
 .play -edit go-traps/slicetraversal.go /START OMIT/,/STOP OMIT/
 
-
 ## Discussion
 
 When ranging over a slice with only one variable, it yields the index, not the element.
@@ -75,13 +74,18 @@ Encoding: **UTF-8**, **UTF-16**, **UTF-32**
 
 : https://pkg.go.dev/golang.org/x/tools/go/analysis/passes/loopclosure
 
+## Test parallel
+
+.play -edit go-traps/loopvar_test.go /START OMIT/,/STOP OMIT/
+
 ## Discussion
 
 Loop variable is per-loop, not per-iteration.
 
-**Go 1.21** is expected to support `GOEXPERIMENT=loopvar`, to make loop variables per-iteration instead of per-loop.
+**Go 1.21** supports `GOEXPERIMENT=loopvar` flag, which makes loop variables per-iteration instead of per-loop.
 
 : https://github.com/golang/go/discussions/56010
+: https://github.com/golang/go/wiki/LoopvarExperiment
 
 ## #4 Variable shadowing
 
