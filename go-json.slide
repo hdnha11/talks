@@ -1,0 +1,283 @@
+# JSON in Go
+
+Nha Hoang
+12 Apr 2024
+hdnha11@gmail.com
+@hdnha
+
+## Topics
+
+- JSON in Go
+- Maps and structs
+- Parsing unknown type
+- Parsing with some unknown fields
+
+.image go-json/go-json.png
+
+## JSON
+
+- JavaScript Object Notation, [RFC-7159](https://www.rfc-editor.org/rfc/rfc7159.html)
+- **Text format** for the serialization of structured data
+- **Lightweight**, limited types: null, Number, String, Boolean, Array, Object
+
+## Marshaling Map
+
+Creating JSON is very straight forward:
+
+.play -edit go-json/marshalmap/main.go /START OMIT/,/STOP OMIT/
+
+## Marshaling Struct
+
+Creating JSON is very straight forward:
+
+.play -edit go-json/marshalstruct/main.go /START OMIT/,/STOP OMIT/
+
+## Unmarshaling to Map
+
+Unmarshaling JSON is a bit trickier:
+
+.play -edit go-json/unmarshalmap/main.go /START OMIT/,/STOP OMIT/
+
+## Unmarshaling to Struct
+
+Avoid map if possible. _any_ says nothing.
+
+.play -edit go-json/unmarshalstruct/main.go /START OMIT/,/STOP OMIT/
+
+## Unknown types
+
+Structs are great, but what if we don't know the data type before unmarshaling?
+
+.image go-json/no-idea.jpeg
+
+## Input may be
+
+- string or number
+
+```
+"123"
+123
+```
+
+- single value, or array
+
+```
+{...}
+[{...},{...}]
+```
+
+- success, or error
+
+```
+{"success":true,"data":{...}}
+{"success":false,"error":"..."}
+```
+
+## Number, or string of number
+
+Sometimes strings, and other times numbers.
+
+Sometimes:
+```
+{"credit_score": "720"}
+```
+
+Other times:
+```
+{"credit_score": 640}
+```
+
+.image go-json/i-dont-understand.jpeg
+
+## Number, or string of number
+
+The [json.Unmarshaler](https://pkg.go.dev/encoding/json#Unmarshaler) interface.
+
+.code go-json/intorstring/main.go /START HELPER OMIT/,/STOP HELPER OMIT/
+
+## Number, or string of number
+
+.play -edit go-json/intorstring/main.go /START OMIT/,/STOP OMIT/
+
+## Single value, or array of values
+
+If there is only one result:
+
+```
+{"results": "peekaboo"}
+```
+
+Otherwise:
+
+```
+{"results": ["one", "two", ...]}
+```
+
+## Single value, or array of values
+
+Same strategy:
+
+.code go-json/stringorarray/main.go /START HELPER OMIT/,/STOP HELPER OMIT/
+
+## Single value, or array of values
+
+.play -edit go-json/stringorarray/main.go /START OMIT/,/STOP OMIT/
+
+## Unknown types
+
+.image go-json/give-me.jpeg
+
+## Unknown types
+
+API may return multiple response types. Some use common fields (i.e. status, type), some don't.
+
+Success:
+```
+{"data": {...}}
+```
+
+Failure:
+```
+{"error": "Resource not found"}}
+```
+
+## Unknown types: No shared
+
+If there are no shared fields, we can use a wrapper type to embed them (like a union).
+
+.code go-json/responsenoshared/main.go /START HELPER OMIT/,/STOP HELPER OMIT/
+
+## Unknown types
+
+.play -edit go-json/responsenoshared/main.go /START OMIT/,/STOP OMIT/
+
+## Unknown types: Shared
+
+If there are shared fields, the situation is less straight-forward.
+
+Success:
+```
+{"status": "ok", "data": {...}}
+```
+
+Failure:
+```
+{"status": "error", "error": "Resource not found"}}
+```
+
+## Unknown types: Shared
+
+.code go-json/responseshared/main.go /START HELPER OMIT/,/STOP HELPER OMIT/
+
+## Unknown types: Shared
+
+Wraps types works, but it can be cumbersome:
+- embedded fields conflict (both name and type)
+- more than two types (knows which is which)
+- waste of space (unused fields)
+
+.play -edit go-json/responseshared/main.go /START OMIT/,/STOP OMIT/
+
+## Unknown types: Container
+
+Let's suppose we may receive any of three types:
+
+```
+{"shape": "circle", "radius": 3.14}
+{"shape": "rectangle", "width": 7.2, "height": 4}
+{"shape": "triangle", "base": 8.6, "height": 6.2}
+```
+
+.code go-json/container/main.go /START TYPE OMIT/,/STOP TYPE OMIT/
+
+## Unknown types: Container
+
+Go doesn't allow define method on interface type, that why we need to wrap the result in a struct.
+
+.code go-json/container/main.go /START CONTAINER PART1 OMIT/,/STOP CONTAINER PART1 OMIT/
+
+Cont.
+
+## Unknown types: Container
+
+.code go-json/container/main.go /START CONTAINER PART2 OMIT/,/STOP CONTAINER PART2 OMIT/
+
+## Unknown types: Container
+
+.play -edit go-json/container/main.go /START OMIT/,/STOP OMIT/
+
+## Unknown types: Container collection
+
+The container can also be a slice (or map) of objects, rather than a single object.
+
+Using [json.RawMessage](https://pkg.go.dev/encoding/json#RawMessage) to delay JSON decoding.
+
+.code go-json/containercollection/main.go /START CONTAINER PART1 OMIT/,/STOP CONTAINER PART1 OMIT/
+
+Cont.
+
+## Unknown types: Container collection
+
+.code go-json/containercollection/main.go /START CONTAINER PART2 OMIT/,/STOP CONTAINER PART2 OMIT/
+
+## Unknown types: Container collection
+
+.play -edit go-json/containercollection/main.go /START OMIT/,/STOP OMIT/
+
+## Unknown types: Better container collection
+
+It is not efficient to load the whole list into memory. We can do better.
+
+.code go-json/containercollectionbetter/main.go /START CONTAINER PART1 OMIT/,/STOP CONTAINER PART1 OMIT/
+
+## Unknown types: Better container collection
+
+.code go-json/containercollectionbetter/main.go /START CONTAINER PART2 OMIT/,/STOP CONTAINER PART2 OMIT/
+
+## Unknown types: Better container collection
+
+.play -edit go-json/containercollectionbetter/main.go /START OMIT/,/STOP OMIT/
+
+## Hybrid struct/map
+
+.image go-json/hybrid.jpeg
+
+## Hybrid struct/map
+
+Imagine you are parsing a log file with some known, and some unknown fields.
+
+```
+{"time": 1711871705, "service": "direct-billing", "log": "hi"}
+{"time": 1711871728, "service": "direct-order", "message": "hello"}
+{"time": 1711871733, "service": "direct-shipper", "module": "http", "ip": "192.168.1.1"}
+```
+
+## Hybrid struct/map
+
+.code go-json/hybridunmarshal/main.go /START TYPE OMIT/,/STOP TYPE OMIT/
+
+## Hybrid struct/map
+
+.play -edit go-json/hybridunmarshal/main.go /START OMIT/,/STOP OMIT/
+
+## Hybrid struct/map: Encoding
+
+.image go-json/reverse.jpeg
+
+## Hybrid struct/map: Encoding
+
+.code go-json/hybridmarshal/main.go /START TYPE OMIT/,/STOP TYPE OMIT/
+
+## Hybrid struct/map: Encoding
+
+.play -edit go-json/hybridmarshal/main.go /START OMIT/,/STOP OMIT/
+
+## References
+
+Advanced JSON Handling in Go:
+
+.link https://www.youtube.com/watch?v=Tgg-ChT4IZE
+
+Slide and sample codes:
+
+.link https://github.com/hdnha11/talks
