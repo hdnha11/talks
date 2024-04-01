@@ -262,6 +262,8 @@ Imagine you are parsing a log file with some known, and some unknown fields.
 
 ## Hybrid struct/map: Encoding
 
+The [json.Marshaler](https://pkg.go.dev/encoding/json#Marshaler) interface.
+
 .image go-json/reverse.jpeg
 
 ## Hybrid struct/map: Encoding
