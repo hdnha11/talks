@@ -13,11 +13,8 @@ type LogRecord struct {
 }
 
 func (r LogRecord) MarshalJSON() ([]byte, error) {
-	var v = struct {
-		LogRecord
-		MarshalJSON struct{} `json:"-"`
-	}{LogRecord: r}
-	record, err := json.Marshal(v)
+	type copyLogRecord LogRecord // another trick to remove MarshalJSON method
+	record, err := json.Marshal(copyLogRecord(r))
 	if err != nil {
 		return nil, err
 	}
@@ -34,10 +31,8 @@ func (r LogRecord) MarshalJSON() ([]byte, error) {
 // STOP TYPE OMIT
 
 func (r *LogRecord) UnmarshalJSON(data []byte) error {
-	var v struct {
-		LogRecord
-		UnmarshalJSON struct{} // shadow the UnmarshalJSON method
-	}
+	type copyLogRecord LogRecord
+	var v copyLogRecord
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
 	}
@@ -47,7 +42,7 @@ func (r *LogRecord) UnmarshalJSON(data []byte) error {
 	delete(d, "service")
 	delete(d, "time")
 
-	*r = v.LogRecord
+	*r = LogRecord(v)
 	r.Data = d
 	return nil
 }
